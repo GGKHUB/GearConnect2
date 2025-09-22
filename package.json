@@ -1,0 +1,40 @@
+{
+  "name": "car-enthusiasts-social",
+  "version": "1.0.0",
+  "description": "A social media application for automobile enthusiasts",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon server/index.js",
+    "client": "cd client && ng serve",
+    "build": "cd client && ng build",
+    "install-all": "npm install && cd client && npm install",
+    "init-db": "node server/scripts/initDatabase.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "mssql": "^11.0.1",
+    "multer": "^1.4.5-lts.1",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.3",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "social-media",
+    "automobile",
+    "cars",
+    "enthusiasts"
+  ],
+  "author": "GearConnect Team",
+  "license": "MIT"
+}
