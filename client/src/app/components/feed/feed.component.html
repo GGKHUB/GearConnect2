@@ -1,0 +1,188 @@
+<div class="feed-container">
+  <div class="container">
+    <div class="feed-header">
+      <h1><i class="fas fa-home"></i> GearConnect Feed</h1>
+      <a routerLink="/create-post" class="btn btn-primary">
+        <i class="fas fa-plus"></i>
+        Create Post
+      </a>
+    </div>
+    
+    <!-- Stories Section -->
+    <app-stories></app-stories>
+    
+    <div class="feed-content">
+      <div class="loading" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Loading posts...</p>
+      </div>
+      
+      <div class="posts" *ngIf="!isLoading && posts.length > 0">
+        <div class="post" *ngFor="let post of posts">
+          <div class="post-header">
+            <div class="user-info">
+              <img 
+                [src]="getImageUrl(post.userId.profilePicture || '/assets/default-avatar.svg')" 
+                [alt]="post.userId.username"
+                class="user-avatar clickable-avatar"
+                (click)="viewUserProfile(post.userId.id)"
+              >
+              <div class="user-details">
+                <h3 class="username-link" (click)="viewUserProfile(post.userId.id)">{{ post.userId.username }}</h3>
+                <p class="post-time">{{ formatDate(post.createdAt) }}</p>
+              </div>
+            </div>
+            <div class="post-actions-header" *ngIf="isCurrentUserPost(post)">
+              <button 
+                class="delete-btn" 
+                (click)="deletePost(post)"
+                [disabled]="isDeleting[post.id]"
+                title="Delete post"
+              >
+                <i class="fas fa-trash" *ngIf="!isDeleting[post.id]"></i>
+                <i class="fas fa-spinner fa-spin" *ngIf="isDeleting[post.id]"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="post-content">
+            <p class="post-caption" *ngIf="post.caption">{{ post.caption }}</p>
+            <img 
+              [src]="getImageUrl(post.imageUrl)" 
+              [alt]="post.caption" 
+              class="post-image clickable-image"
+              (click)="viewPost(post)"
+            >
+          </div>
+          
+          <div class="post-actions">
+            <button 
+              class="action-btn like-btn" 
+              [class.liked]="isLiked(post)"
+              (click)="toggleLike(post)"
+            >
+              <i class="fas fa-heart"></i>
+              <span>{{ post.likes.length }}</span>
+            </button>
+            
+            <button class="action-btn comment-btn" (click)="toggleComments(post)">
+              <i class="fas fa-comment"></i>
+              <span>{{ post.comments.length }}</span>
+            </button>
+          </div>
+
+          <!-- Likers Section -->
+          <div class="likers-section" *ngIf="post.likes.length > 0">
+            <div class="likers-header">
+              <i class="fas fa-heart"></i>
+              <span *ngIf="post.likes.length === 1">{{ post.likes[0].username }} liked this</span>
+              <span *ngIf="post.likes.length === 2">{{ post.likes[0].username }} and {{ post.likes[1].username }} liked this</span>
+              <span *ngIf="post.likes.length > 2">{{ post.likes[0].username }} and {{ post.likes.length - 1 }} others liked this</span>
+            </div>
+            <div class="likers-list" *ngIf="post.showLikers">
+              <div class="liker-item" *ngFor="let liker of post.likes">
+                <img 
+                  [src]="getImageUrl(liker.profilePicture || '/assets/default-avatar.svg')" 
+                  [alt]="liker.username"
+                  class="liker-avatar"
+                >
+                <span class="liker-name">{{ liker.username }}</span>
+              </div>
+            </div>
+            <button 
+              class="show-likers-btn" 
+              *ngIf="post.likes.length > 0"
+              (click)="toggleLikers(post)"
+            >
+              {{ post.showLikers ? 'Hide' : 'Show' }} who liked this
+            </button>
+          </div>
+          
+          <div class="comments-section" *ngIf="post.showComments">
+            <div class="comments" *ngIf="post.comments.length > 0">
+              <div class="comment" *ngFor="let comment of post.comments">
+                <img 
+                  [src]="getImageUrl(comment.userId.profilePicture || '/assets/default-avatar.svg')" 
+                  [alt]="comment.userId.username"
+                  class="comment-avatar"
+                >
+                <div class="comment-content">
+                  <div class="comment-header">
+                    <strong>{{ comment.userId.username }}</strong>
+                    <span class="comment-time">{{ formatDate(comment.createdAt) }}</span>
+                  </div>
+                  <p>{{ comment.text }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="add-comment">
+              <input 
+                type="text" 
+                placeholder="Add a comment..." 
+                class="comment-input"
+                [(ngModel)]="newComments[post.id]"
+                (keyup.enter)="addComment(post)"
+              >
+              <button 
+                class="btn btn-primary btn-sm"
+                (click)="addComment(post)"
+                [disabled]="!newComments[post.id] || !newComments[post.id].trim()"
+              >
+                Post
+              </button>
+            </div>
+          </div>
+
+          <!-- Commenters Summary Section -->
+          <div class="commenters-summary" *ngIf="post.comments.length > 0 && !post.showComments">
+            <div class="commenters-header">
+              <i class="fas fa-comment"></i>
+              <span *ngIf="post.comments.length === 1">{{ post.comments[0].userId.username }} commented</span>
+              <span *ngIf="post.comments.length === 2">{{ post.comments[0].userId.username }} and {{ post.comments[1].userId.username }} commented</span>
+              <span *ngIf="post.comments.length > 2">{{ post.comments[0].userId.username }} and {{ post.comments.length - 1 }} others commented</span>
+            </div>
+            <div class="commenters-preview" *ngIf="post.comments.length > 0">
+              <div class="commenter-item" *ngFor="let comment of post.comments.slice(0, 3)">
+                <img 
+                  [src]="getImageUrl(comment.userId.profilePicture || '/assets/default-avatar.svg')" 
+                  [alt]="comment.userId.username"
+                  class="commenter-avatar"
+                >
+                <div class="commenter-info">
+                  <span class="commenter-name">{{ comment.userId.username }}</span>
+                  <span class="comment-preview">{{ comment.text.length > 50 ? comment.text.substring(0, 50) + '...' : comment.text }}</span>
+                </div>
+              </div>
+              <div class="more-comments" *ngIf="post.comments.length > 3">
+                <span>+{{ post.comments.length - 3 }} more comments</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="empty-state" *ngIf="!isLoading && posts.length === 0">
+        <i class="fas fa-car"></i>
+        <h2>No posts yet</h2>
+        <p>Be the first to share your car photos!</p>
+        <a routerLink="/create-post" class="btn btn-primary">
+          <i class="fas fa-plus"></i>
+          Create First Post
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Post Viewer Modal -->
+<app-post-viewer
+  [post]="selectedPost"
+  [isVisible]="showPostViewer"
+  [posts]="posts"
+  [currentIndex]="selectedPostIndex"
+  [showNavigation]="posts.length > 1"
+  (closeEvent)="closePostViewer()"
+  (previousEvent)="previousPost()"
+  (nextEvent)="nextPost()"
+></app-post-viewer>

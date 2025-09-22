@@ -1,0 +1,93 @@
+<div class="stories-container">
+  <div class="stories-header">
+    <h3>
+      <i class="fas fa-clock"></i>
+      Stories
+    </h3>
+    <button class="create-story-btn" (click)="createStory()">
+      <i class="fas fa-plus"></i>
+      Add Story
+    </button>
+  </div>
+
+  <div class="stories-scroll" *ngIf="stories.length > 0">
+    <div class="story-item" 
+         *ngFor="let story of stories" 
+         (click)="viewStory(story)"
+         [class.own-story]="isOwnStory(story)">
+      <div class="story-avatar">
+        <img 
+          [src]="getImageUrl(story.userId.profilePicture)" 
+          [alt]="story.userId.username"
+          class="avatar-img"
+        >
+        <div class="story-indicator"></div>
+      </div>
+      <div class="story-info">
+        <span class="username">{{ story.userId.username }}</span>
+        <span class="time-ago">{{ getTimeAgo(story.createdAt) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-stories" *ngIf="stories.length === 0 && !isLoading">
+    <i class="fas fa-book-open"></i>
+    <h4>No stories yet</h4>
+    <p>Be the first to share your automotive story!</p>
+    <button class="btn btn-primary" (click)="createStory()">
+      <i class="fas fa-plus"></i>
+      Create Story
+    </button>
+  </div>
+
+  <div class="loading-stories" *ngIf="isLoading">
+    <i class="fas fa-spinner fa-spin"></i>
+    <span>Loading stories...</span>
+  </div>
+</div>
+
+<!-- Story Viewer Modal -->
+<div class="story-modal" *ngIf="selectedStory" (click)="closeStoryViewer()">
+  <div class="story-viewer" (click)="$event.stopPropagation()">
+    <div class="story-header">
+      <div class="story-user">
+        <img 
+          [src]="getImageUrl(selectedStory.userId.profilePicture)" 
+          [alt]="selectedStory.userId.username"
+          class="user-avatar"
+        >
+        <div class="user-info">
+          <span class="username">{{ selectedStory.userId.username }}</span>
+          <span class="time">{{ getTimeAgo(selectedStory.createdAt) }}</span>
+        </div>
+      </div>
+      <div class="story-actions">
+        <span class="views" *ngIf="selectedStory.views > 0">
+          <i class="fas fa-eye"></i>
+          {{ selectedStory.views }}
+        </span>
+        <button class="delete-btn" 
+                *ngIf="isOwnStory(selectedStory)" 
+                (click)="deleteStory(selectedStory.id)">
+          <i class="fas fa-trash"></i>
+        </button>
+        <button class="close-btn" (click)="closeStoryViewer()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="story-content">
+      <div class="story-image" *ngIf="selectedStory.imageUrl">
+        <img [src]="getImageUrl(selectedStory.imageUrl)" [alt]="selectedStory.content">
+      </div>
+      <div class="story-text">
+        <p>{{ selectedStory.content }}</p>
+      </div>
+    </div>
+
+    <div class="story-progress">
+      <div class="progress-bar" [style.width.%]="storyProgress"></div>
+    </div>
+  </div>
+</div>
