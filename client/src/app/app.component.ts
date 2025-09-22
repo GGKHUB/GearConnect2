@@ -21,6 +21,13 @@ import { environment } from '../environments/environment';
           <button (click)="testConnection()" style="margin: 5px; padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 3px;">Test API Connection</button>
           <button (click)="testRegister()" style="margin: 5px; padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 3px;">Test Register</button>
         </div>
+        
+        <!-- Production debug info -->
+        <div *ngIf="environment.production" style="background: #d1ecf1; padding: 10px; margin: 10px; border: 1px solid #bee5eb; border-radius: 4px; font-size: 12px;">
+          <strong>Production Debug:</strong><br>
+          API URL: {{ environment.apiUrl }}<br>
+          <button (click)="testConnection()" style="margin: 5px; padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 3px; font-size: 12px;">Test API</button>
+        </div>
         <router-outlet></router-outlet>
       </main>
     </div>

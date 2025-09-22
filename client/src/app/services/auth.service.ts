@@ -45,18 +45,24 @@ export class AuthService {
   }
 
   register(userData: { username: string; email: string; password: string }): Observable<AuthResponse> {
+    console.log('Registering user with API URL:', this.apiUrl);
+    console.log('Register data:', userData);
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData)
       .pipe(
         tap(response => {
+          console.log('Registration successful:', response);
           this.setUserData(response.token, response.user);
         })
       );
   }
 
   login(credentials: { email: string; password: string }): Observable<AuthResponse> {
+    console.log('Logging in with API URL:', this.apiUrl);
+    console.log('Login credentials:', { ...credentials, password: '***' });
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(
         tap(response => {
+          console.log('Login successful:', response);
           this.setUserData(response.token, response.user);
         })
       );
