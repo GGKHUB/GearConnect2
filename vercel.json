@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "buildCommand": "cd client && npm run build",
+  "outputDirectory": "client/dist/car-enthusiasts-client",
+  "installCommand": "cd client && npm install",
+  "framework": null,
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
